@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Результаты {{ question.question_text }}{% endblock %}
+
+{% block content %}
+<h1>{{ question.question_text }}</h1>
+{% if question.image %}
+    <img src="{{ question.image.url }}" alt="Question Image" style="max-width: 100%;">
+{% endif %}
+<p>{{ question.full_description }}</p>
+
+<ul>
+{% for choice in question.choices.all %}
+    {% if total_votes > 0 %}
+        {% widthratio choice.votes total_votes 100 as percentage %}
+    {% else %}
+        {% widthratio 0 1 100 as percentage %}
+    {% endif %}
+    <li>{{ choice.choice_text }} -- {{ choice.votes }} голосов ({{ percentage|floatformat:1 }}%)</li>
+{% endfor %}
+</ul>
+
+<a href="{% url 'polls:detail' question.id %}">Голосовать снова?</a>
+{% endblock %}

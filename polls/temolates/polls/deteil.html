@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ question.question_text }}{% endblock %}
+
+{% block content %}
+<h1>{{ question.question_text }}</h1>
+{% if question.image %}
+    <img src="{{ question.image.url }}" alt="Question Image" style="max-width: 100%;">
+{% endif %}
+<p>{{ question.full_description }}</p>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+{% if not question.is_expired %}
+    <form action="{% url 'polls:vote' question.id %}" method="post">
+    {% csrf_token %}
+    {% for choice in question.choices.all %}
+        <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+    {% endfor %}
+    <input type="submit" value="Голосовать">
+    </form>
+{% else %}
+    <p>Голосование за этот вопрос завершено.</p>
+{% endif %}
+{% endblock %}

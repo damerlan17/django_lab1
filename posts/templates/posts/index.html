@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Посты{% endblock %}
+
+{% block content %}
+<h1>Последние посты</h1>
+{% if latest_post_list %}
+    <ul>
+    {% for post in latest_post_list %}
+        <li><a href="{% url 'posts:detail' post.id %}">{{ post.title }}</a> - {{ post.pub_date|date:"d M Y H:i" }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Нет доступных постов.</p>
+{% endif %}
+{% endblock %}
