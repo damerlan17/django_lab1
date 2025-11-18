@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Вход{% endblock %}
+
+{% block content %}
+<h2>Войти</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }} <!-- Встроенная форма Django -->
+    <button type="submit">Войти</button>
+</form>
+<p><a href="{% url 'accounts:register' %}">Нет аккаунта? Зарегистрироваться</a></p>
+{% endblock %}
