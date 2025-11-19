@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
+from .models import UserProfile
+from django.contrib.auth.models import User # Импортируем User
 
 def register(request):
     if request.method == 'POST':
@@ -29,17 +31,18 @@ def register(request):
 def profile(request):
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
-        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile) # instance=request.user.profile
+        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
 
         if u_form.is_valid() and p_form.is_valid():
             u_form.save()
             p_form.save()
             messages.success(request, f'Ваш профиль обновлён!')
-            return redirect('profile') # Перенаправляем обратно на страницу профиля, чтобы избежать повторной отправки формы
-
+            # --- ИЗМЕНЕНИЕ ТУТ ---
+            return redirect('accounts:profile') # Используй namespace 'accounts'
+            # --- /ИЗМЕНЕНИЕ ---
     else:
         u_form = UserUpdateForm(instance=request.user)
-        p_form = ProfileUpdateForm(instance=request.user.profile) # instance=request.user.profile
+        p_form = ProfileUpdateForm(instance=request.user.profile)
 
     context = {
         'u_form': u_form,
@@ -47,7 +50,6 @@ def profile(request):
     }
 
     return render(request, 'accounts/profile.html', context=context)
-
 @login_required
 def delete_profile(request):
     if request.method == 'POST':
@@ -74,6 +76,33 @@ def profile(request):
     else:
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)
+
+    context = {
+        'u_form': u_form,
+        'p_form': p_form
+    }
+
+    return render(request, 'accounts/profile.html', context=context)
+
+@login_required
+def profile(request):
+    # Убедимся, что профиль существует, создадим при необходимости
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+    if request.method == 'POST':
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        # Используем 'profile', который мы получили выше
+        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
+
+        if u_form.is_valid() and p_form.is_valid():
+            u_form.save()
+            p_form.save()
+            messages.success(request, f'Ваш профиль обновлён!')
+            return redirect('accounts:profile') # Используем namespace 'accounts'
+    else:
+        u_form = UserUpdateForm(instance=request.user)
+        # Используем 'profile', который мы получили выше
+        p_form = ProfileUpdateForm(instance=profile)
 
     context = {
         'u_form': u_form,

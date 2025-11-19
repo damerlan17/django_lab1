@@ -26,6 +26,9 @@
             <a class="nav-link" href="{% url 'accounts:register' %}">Регистрация</a>
             <!-- Используем 'accounts', так как auth.urls под 'accounts/' -->
             {% endif %}
+            {% if user.is_authenticated %}
+            <a href="{% url 'posts:create' %}">Создать пост</a>
+            {% endif %}
         </div>
     </nav>
 </header>
